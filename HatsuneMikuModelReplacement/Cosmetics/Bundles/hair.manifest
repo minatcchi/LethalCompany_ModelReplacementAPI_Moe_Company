@@ -1,0 +1,97 @@
+ManifestFileVersion: 0
+CRC: 3035489871
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: 4ab53fec97c3b30085c388927f0a1e7c
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: eb513b2d9228c497b0b79ef976796f53
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 4ab53fec97c3b30085c388927f0a1e7c
+HashAppended: 0
+ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 4
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
+- Class: 23
+  Script: {instanceID: 0}
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 33
+  Script: {instanceID: 0}
+- Class: 43
+  Script: {instanceID: 0}
+- Class: 48
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/ponytail/PonytailHairBlonde.mat
+- Assets/hair/Hair1.png
+- Assets/icons/twintailsback_black.png
+- Assets/ponytail/Pink.mat
+- Assets/ponytail/PonyTailHairBlack.prefab
+- Assets/hair/messyhair_white.prefab
+- Assets/icons/default_blonde.png
+- Assets/sidetail/sidetail_brown.prefab
+- Assets/himecut/himecut_blonde.prefab
+- Assets/ponytail/PonyTailHairBlonde.prefab
+- Assets/icons/messy_white.png
+- Assets/icons/sidetail_black.png
+- Assets/ponytail/blondethumbnail.png
+- Assets/ponytail/PonytailHairBlack.mat
+- Assets/icons/twintails_brown.png
+- Assets/twintails.fbx
+- Assets/icons/himecut_blonde.png
+- Assets/sidetail.fbx
+- Assets/icons/twintails_blonde.png
+- Assets/icons/ponytail_blonde.png
+- Assets/icons/default_brown.png
+- Assets/ponytail/PonytailHairBrown.mat
+- Assets/ponytail/PonyTailHairBrown.prefab
+- Assets/icons/sidetail_brown.png
+- Assets/twintailsback/twintailsback_brown.prefab
+- Assets/sidetail/sidetail_black.prefab
+- Assets/icons/twintails_black.png
+- Assets/icons/ponytail_brown.png
+- Assets/ponytail/BlackHair 1.png
+- Assets/twintails/twintails_blonde.prefab
+- Assets/hair/Hair1.prefab
+- Assets/twintailsback/twintailsback_black.prefab
+- Assets/himecut.fbx
+- Assets/icons/himecut_black.png
+- Assets/hair/hair1_icon.png
+- Assets/himecut/himecut_black.prefab
+- Assets/sidetail/sidetail_blonde.prefab
+- Assets/ponytail/Pink.png
+- Assets/ponytail/WhiteHair.mat
+- Assets/hair/Hair1_brown.prefab
+- Assets/twintails/twintails_black.prefab
+- Assets/ponytail/Blonde 1.png
+- Assets/icons/himecut_brown.png
+- Assets/hair/Hair1.mat
+- Assets/Brown.png
+- Assets/White.png
+- Assets/himecut/himecut_brown.prefab
+- Assets/icons/twintails_pink.png
+- Assets/icons/twintailsback_blonde.png
+- Assets/ponytail/blackthumbnail.png
+- Assets/twintails/twintails_brown.prefab
+- Assets/ponytail/brownthumbnail.png
+- Assets/hair/Hair1_blonde.prefab
+- Assets/icons/ponytail_black.png
+- Assets/ponytail/ponytail.fbx
+- Assets/twintails/twintails_pink.prefab
+- Assets/ponytail/Brown 1.png
+- Assets/twintailsback/twintailsback_blonde.prefab
+- Assets/icons/twintailsback_brown.png
+- Assets/hair/Hair1.fbx
+- Assets/icons/sidetail_blonde.png
+- Assets/messywhite.fbx
+Dependencies: []

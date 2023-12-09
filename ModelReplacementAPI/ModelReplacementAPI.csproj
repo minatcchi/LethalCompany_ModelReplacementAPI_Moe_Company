@@ -7,7 +7,7 @@
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
-    <LethalCompanyPath>C:\Program Files (x86)\Steam\steamapps\common\Lethal Company\</LethalCompanyPath>
+    <LethalCompanyPath>D:\SteamLibrary\steamapps\common\Lethal Company\</LethalCompanyPath>
   </PropertyGroup>
   
   <PropertyGroup>

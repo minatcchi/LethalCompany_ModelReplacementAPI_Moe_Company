@@ -13,32 +13,28 @@ using System.Reflection;
 using GameNetcodeStuff;
 using ModelReplacement;
 using BepInEx.Configuration;
+using MoreCompany.Cosmetics;
+using MoreCompany.Utils;
 
 //using System.Numerics;
 
-namespace HatsuneMikuModelReplacement
+namespace SpaceGirlModelReplacement
 {
 
 
 
 
-    [BepInPlugin("meow.MikuModelReplacement", "Miku Model", "1.1.3")]
+    [BepInPlugin("meow.MikuModelReplacement", "Space Girl", "1.0.0")]
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin
     {
         public static ConfigFile config;
-
-        public static ConfigEntry<bool> enableMikuForAllSuits { get; private set; }
-        public static ConfigEntry<string> suitNamesToEnableMiku { get; private set; }
-        
         public static ConfigEntry<float> UpdateRate { get; private set; }
         public static ConfigEntry<float> distanceDisablePhysics { get; private set; }
         public static ConfigEntry<bool> disablePhysicsAtRange { get; private set; }
 
         private static void InitConfig()
         {
-            enableMikuForAllSuits = config.Bind<bool>("Suits to Replace Settings", "Enable Miku for all Suits", false, "Enable to replace every suit with Miku. Set to false to specify suits");
-            suitNamesToEnableMiku = config.Bind<string>("Suits to Replace Settings", "Suits to enable Miku for", "Default,Orange suit", "Enter a comma separated list of suit names.(Additionally, [Green suit,Pajama suit,Hazard suit])");
             UpdateRate = config.Bind<float>("Dynamic Bone Settings", "Update rate", 60, "Refreshes dynamic bones more times per second the higher the number");
             disablePhysicsAtRange = config.Bind<bool>("Dynamic Bone Settings", "Disable physics at range", false, "Enable to disable physics past the specified range");
             distanceDisablePhysics = config.Bind<float>("Dynamic Bone Settings", "Distance to disable physics", 20, "If Disable physics at range is enabled, this is the range after which physics is disabled.");
@@ -47,31 +43,44 @@ namespace HatsuneMikuModelReplacement
         }
         private void Awake()
         {
+
             config = base.Config;
             InitConfig();
-            Assets.PopulateAssets();
-
             // Plugin startup logic
-            if (!enableMikuForAllSuits.Value)
-            {
-                var commaSepList = suitNamesToEnableMiku.Value.Split(',');
-                foreach (var item in commaSepList)
-                {
-                    ModelReplacementAPI.RegisterSuitModelReplacement(item, typeof(BodyReplacementMiku));
-                }
+            AssetBundle cosmeticsBundle = BundleUtilities.LoadBundleFromInternalAssembly("hair", Assembly.GetExecutingAssembly());
+            CosmeticRegistry.LoadCosmeticsFromAssembly(Assembly.GetExecutingAssembly(), cosmeticsBundle);
+            //ModelReplacementAPI.RegisterSuitModelReplacement("Green suit", typeof(BodyReplacementMiku));
+            ModelReplacement.ModelReplacementAPI.RegisterSuitModelReplacement("Default", typeof(BodyReplacementSpaceGirl));
+            ModelReplacement.ModelReplacementAPI.RegisterSuitModelReplacement("Orange suit", typeof(BodyReplacementSpaceGirl));
+            //ModelReplacementAPI.RegisterSuitModelReplacement("Pajama suit", typeof(BodyReplacementMiku));
+            //ModelReplacementAPI.RegisterSuitModelReplacement("Hazard suit", typeof(BodyReplacementMiku));
 
-            }
-            else
-            {
-                ModelReplacementAPI.RegisterModelReplacementOverride(typeof(BodyReplacementMiku));
-            }
-
-            
+            Assets.PopulateAssets();
 
             Harmony harmony = new Harmony("meow.MikuModelReplacement");
             harmony.PatchAll();
             Logger.LogInfo($"Plugin {"meow.MikuModelReplacement"} is loaded!");
         }
+
+
+
+        [HarmonyPatch(typeof(PlayerControllerB))]
+        public class PlayerControllerBPatch
+        {
+
+            [HarmonyPatch("Update")]
+            [HarmonyPostfix]
+            public static void UpdatePatch(ref PlayerControllerB __instance)
+            {
+                if (__instance.playerSteamId == 0) { return; }
+                //ModelReplacementAPI.SetPlayerModelReplacement(__instance, typeof(BodyReplacementMinahoshi));
+
+            }
+
+        }
+
+
+
     }
     public static class Assets
     {

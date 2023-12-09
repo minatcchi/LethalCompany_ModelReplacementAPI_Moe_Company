@@ -3,6 +3,7 @@ using GameNetcodeStuff;
 using LCThirdPerson;
 using ModelReplacement;
 using MoreCompany.Cosmetics;
+using MoreCompany;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,7 @@ namespace ModelReplacement
         public bool renderLocalDebug = false;
         public bool renderBase = false;
         public bool renderModel = false;
-
+        private bool died = false;
         public bool DangerousViewState()
         {
             return ThirdPersonCamera.ViewState;
@@ -104,7 +105,7 @@ namespace ModelReplacement
         private void CreateAndParentRagdoll(DeadBodyInfo bodyinfo)
         {
             Console.WriteLine($"Death on {controller.playerUsername}");
-
+            died = true;
             deadBody = bodyinfo.gameObject;
             SkinnedMeshRenderer deadBodyRenderer = deadBody.GetComponentInChildren<SkinnedMeshRenderer>();
             replacementDeadBody = UnityEngine.Object.Instantiate<GameObject>(replacementModel);
@@ -318,6 +319,9 @@ namespace ModelReplacement
         private void DangerousParent()
         {
             var applications = controller.gameObject.GetComponentsInChildren<CosmeticApplication>();
+            {
+
+            }
             if ((applications.Any()))
             {
                 foreach (var application in applications)
