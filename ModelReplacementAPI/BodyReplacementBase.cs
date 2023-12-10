@@ -6,6 +6,7 @@ using MoreCompany.Cosmetics;
 using MoreCompany;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,7 +22,10 @@ namespace ModelReplacement
         public bool renderLocalDebug = false;
         public bool renderBase = false;
         public bool renderModel = false;
-        private bool died = false;
+        private bool isCoroutineRunning = false;
+        private PlayerDeathTracker playerDeathTracker;
+        private CosmeticApplication[] applications;
+        private bool runConnectHairOnce = false;
         public bool DangerousViewState()
         {
             return ThirdPersonCamera.ViewState;
@@ -150,15 +154,17 @@ namespace ModelReplacement
 
 
             }
-            died = true;
+            playerDeathTracker.Died = true;
 
         }
 
         public virtual void AfterAwake()
         {
 
+
+
         }
-        public void RepairModel()
+        public void RepairModel()                                                                     
         {
             if (controller == null)
             {
@@ -188,8 +194,8 @@ namespace ModelReplacement
 
         internal void Awake()
         {
-            
             controller = base.GetComponent<PlayerControllerB>();
+
             Console.WriteLine($"Awake {controller.playerUsername}");
 
             //Load model
@@ -262,7 +268,18 @@ namespace ModelReplacement
             nameTagObj = gameObjects.Where(x => x.gameObject.name == "LevelSticker").First();
             nameTagObj2 = gameObjects.Where(x => x.gameObject.name == "BetaBadge").First();
             Console.WriteLine($"AwakeEnd {controller.playerUsername}");
+            if (base.gameObject.GetComponents<PlayerDeathTracker>().Length == 0)
 
+            {
+                Console.WriteLine("Player death tracker component added");
+                playerDeathTracker = gameObject.AddComponent<PlayerDeathTracker>();
+            }
+            else
+            {
+                Console.WriteLine("Player death tracker re-connected");
+
+                playerDeathTracker = gameObject.GetComponent<PlayerDeathTracker>();
+            }
             AfterAwake();
         }
 
@@ -288,17 +305,96 @@ namespace ModelReplacement
         
         private void AttemptUnparentMoreCompanyCosmetics()
         {
+      
             if (!ModelReplacementAPI.moreCompanyPresent) { return; }
             if (!moreCompanyCosmeticsReparented) { return; } //no cosmetics parented
             DangerousUnparent();
         }
+        private IEnumerator AttemptReparentMoreCompanyCosmeticsCoroutine()
+        {
+            if (isCoroutineRunning) yield break; // Prevent multiple instances
+            isCoroutineRunning = true;
+
+
+
+            if (!ModelReplacementAPI.moreCompanyPresent) yield break;
+            if (moreCompanyCosmeticsReparented) yield break; // cosmetics already parented
+
+            //var hair_controller_source = StartOfRound.Instance.allPlayerScripts[StartOfRound.Instance.playersRevived].GetComponent<PlayerControllerB>();
+          var hair_controller_source = base.GetComponent<PlayerControllerB>();
+            Console.WriteLine("Hair Controller player" + hair_controller_source.playerUsername);
+
+            bool childrenFound = false;
+
+            for (int i = 0; i < 5; i++)
+            {               
+
+                var cosmeticAppsChilds = hair_controller_source.GetComponentsInChildren<CosmeticApplication>();
+                var numberOfChildren = cosmeticAppsChilds.Length;
+                Console.WriteLine("Updated number of children: " + numberOfChildren);
+
+                if (numberOfChildren != 0)
+                {
+                    childrenFound = true;
+                    break; // Exit the loop if children are found
+                }
+
+                yield return new WaitForSeconds(0.1f); // Wait for 1 second before the next check
+            }
+
+            if (!childrenFound && playerDeathTracker.Died == true)
+            {
+                // If no children are found after 5 checks, execute this
+                hair_controller_source = base.GetComponent<PlayerControllerB>();
+                ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
+                    runConnectHairOnce = true;
+                for (int i = 0; i < 5; i++)
+                    {
+
+                        var cosmeticAppsChilds = hair_controller_source.GetComponentsInChildren<CosmeticInstance>();
+                        var numberOfChildren = cosmeticAppsChilds.Length;
+                        Console.WriteLine("Updated number of children: " + numberOfChildren);
+
+                        if (numberOfChildren != 0)
+                        {
+                            childrenFound = true;
+                            break; // Exit the loop if children are found
+                        }
+                        else {
+                        Console.WriteLine("None found. COmmence grabbin " + numberOfChildren);
+
+                        cosmeticAppsChilds = hair_controller_source.GetComponentsInChildren<CosmeticInstance>();
+                            numberOfChildren = cosmeticAppsChilds.Length;
+                            Console.WriteLine("Updated number of children: " + numberOfChildren);
+                        }
+                        yield return new WaitForSeconds(0.1f); // Wait for 1 second before the next check
+                    }
+                }
+            
+
+            // If children are found during the checks, execute this
+            DangerousParent();
+                
+                isCoroutineRunning = false;
+                yield break; // cosmetics already parented
+  
+
+        }
+
+        private void StartReparentCoroutine()
+        {
+            StartCoroutine(AttemptReparentMoreCompanyCosmeticsCoroutine());
+        }
+
         private void AttemptReparentMoreCompanyCosmetics()
         {
             if (!ModelReplacementAPI.moreCompanyPresent) { return; }
-            if (moreCompanyCosmeticsReparented) { return; } //cosmetics already parented
+            if (moreCompanyCosmeticsReparented) { return; } // cosmetics already parented
+
+     
 
             DangerousParent();
-
+            
         }
         private void DangerousUnparent()
         {
@@ -307,10 +403,11 @@ namespace ModelReplacement
             {
                 foreach (var application in applications)
                 {
-                    foreach (var cosmeticInstance in application.spawnedCosmetics)
+                    Destroy(application);
+     /*               foreach (var cosmeticInstance in application.spawnedCosmetics)
                     {
                         cosmeticInstance.transform.parent = null;
-                    }
+                    }*/
                     moreCompanyCosmeticsReparented = false;
                 }
             }
@@ -319,16 +416,33 @@ namespace ModelReplacement
         }
         private void DangerousParent()
         {
-             CosmeticApplication[] applications;
-   
-            applications = controller.gameObject.GetComponentsInChildren<CosmeticApplication>();
+            controller = base.GetComponent<PlayerControllerB>();
 
+            if (playerDeathTracker.Died == false) {
+                applications = controller.gameObject.GetComponentsInChildren<CosmeticApplication>();
+            }
+            else if (playerDeathTracker.Died == true)
+            {
+                RepairModel();
+
+                // If no children are found after 5 checks, execute this
+                var hair_controller_source = controller.gameObject.GetComponent<PlayerControllerB>();
+                Console.WriteLine("Player death true setting up dangerous parent");
+                if (localPlayer) {
+
+                    Console.WriteLine($"Re-setting up {controller.playerUsername}");
+                    ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
+                }
+                applications = hair_controller_source.GetComponentsInChildren<CosmeticApplication>();
+
+            }
             if ((applications.Any()))
             {
                 foreach (var application in applications)
                 {
                     Console.WriteLine($"{application.GetType().Name} parent");
                     Transform mappedHead = Map.GetMappedTransform("spine.004");
+  
                     Transform mappedChest = Map.GetMappedTransform("spine.003");
                     Transform mappedLowerArmRight = Map.GetMappedTransform("arm.R_lower");
                     Transform mappedHip = Map.GetMappedTransform("spine");
@@ -345,7 +459,6 @@ namespace ModelReplacement
 
                     foreach (var cosmeticInstance in application.spawnedCosmetics)
                     {
-                        if (cosmeticInstance != null) { 
                         Transform transform = null;
                         switch (cosmeticInstance.cosmeticType)
                         {
@@ -371,15 +484,29 @@ namespace ModelReplacement
                         cosmeticInstance.transform.position = transform.position;
                         cosmeticInstance.transform.rotation = transform.rotation;
                         cosmeticInstance.transform.parent = transform;
+               
+
                     }
-                    }
-                    if (died == true)
-                    {
-                        Console.WriteLine("Died = false");
-                        died = false;
-                    }
-                    moreCompanyCosmeticsReparented = true;
+             
+
                 }
+                if (playerDeathTracker.Died == true)
+                {
+                    var cosmeticAppsChilds = base.GetComponentsInChildren<CosmeticInstance>();
+                    var numberOfChildren = cosmeticAppsChilds.Length;
+                    Console.WriteLine("Updated number of children: " + numberOfChildren);
+                    if (numberOfChildren > 0)
+                    {                    Console.WriteLine("More than 1 child found, marking as complete " + numberOfChildren);
+                        playerDeathTracker.Died = false;
+
+                        moreCompanyCosmeticsReparented = true;
+                    }
+
+                }
+                else { 
+                moreCompanyCosmeticsReparented = true;
+                }
+
                 Console.WriteLine(" reparent done");
             }
         }
@@ -420,32 +547,15 @@ namespace ModelReplacement
                 }
                 SetRenderers(renderModel);
             }
-
+           // Console.WriteLine("PlayerDeathStatus for" + controller.playerUsername + ":" + playerDeathTracker.Died);
 
             //Update replacement model
             Map.UpdateModelbones();
-            if (!controller.isPlayerDead && died == false && !localPlayer) { 
-           // Console.WriteLine("DeathStatus:" + died);
-            AttemptReparentMoreCompanyCosmetics();
-            }
-            if (died == true)
+            if (!controller.isPlayerDead)
             {
-            //    Console.WriteLine("DeathStatus Died:" + died);
-        
-                    var cosmeticAppsChilds = controller.GetComponentsInChildren<CosmeticInstance>();
-                    var numberOfChildren = cosmeticAppsChilds.Length;
-                    Console.WriteLine("Updated number of children: " + numberOfChildren);
-                    if (numberOfChildren == 0) { 
-
-                    var hair_controller_source = StartOfRound.Instance.allPlayerScripts[StartOfRound.Instance.thisClientPlayerId].GetComponent<PlayerControllerB>();
-
-                ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
-        
-                }
                 AttemptReparentMoreCompanyCosmetics();
-          
             }
-
+          
             //Ragdoll
             if (ragdollEnabled)
             {
@@ -489,7 +599,7 @@ namespace ModelReplacement
            
             nameTagObj.enabled = true;
             nameTagObj2.enabled = true;
-         //   AttemptUnparentMoreCompanyCosmetics();
+           AttemptUnparentMoreCompanyCosmetics();
 
             Destroy(replacementModel);
             Destroy(replacementDeadBody);

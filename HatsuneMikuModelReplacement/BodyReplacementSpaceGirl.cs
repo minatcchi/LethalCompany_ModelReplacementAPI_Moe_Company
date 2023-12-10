@@ -21,7 +21,7 @@ namespace SpaceGirlModelReplacement
         {
             string model_name = "space girl";
             return Assets.MainAssetBundle.LoadAsset<GameObject>(model_name);
-        } 
+        }  
 
         public override void AddModelScripts()
         {
