@@ -160,7 +160,7 @@ namespace ModelReplacement
 
         public virtual void AfterAwake()
         {
-
+           
 
 
         }
@@ -201,7 +201,7 @@ namespace ModelReplacement
             //Load model
             replacementModel = LoadAssetsAndReturnModel();
 
-            if(replacementModel == null)
+            if (replacementModel == null)
             {
                 Console.WriteLine("LoadAssetsAndReturnModel returned null");
             }
@@ -232,7 +232,7 @@ namespace ModelReplacement
             {
                 ModelReplacementAPI.Instance.Logger.LogError($"Could not set all model scripts.\n Error: {e.Message}");
             }
-            
+
 
             //Instantiate model
             replacementModel = UnityEngine.Object.Instantiate<GameObject>(replacementModel);
@@ -250,7 +250,7 @@ namespace ModelReplacement
             while (true)
             {
                 string folder = new DirectoryInfo(pluginsPath).Name;
-                if(folder == "plugins") { break; }
+                if (folder == "plugins") { break; }
                 pluginsPath = Path.Combine(pluginsPath, "..");
             }
             string[] allfiles = Directory.GetFiles(pluginsPath, "*.json", SearchOption.AllDirectories);
@@ -259,6 +259,8 @@ namespace ModelReplacement
             Map = BoneMap.DeserializeFromJson(boneMapJsonStr);
 
             //Map bones and parent mdodel
+            controller = base.GetComponent<PlayerControllerB>();
+
             Map.MapBones(controller.thisPlayerModel.bones, GetMappedBones());
             Map.SetBodyReplacement(this);
             ReparentModel();
@@ -280,6 +282,7 @@ namespace ModelReplacement
 
                 playerDeathTracker = gameObject.GetComponent<PlayerDeathTracker>();
             }
+            AttemptReparentMoreCompanyCosmetics();
             AfterAwake();
         }
 
@@ -295,6 +298,7 @@ namespace ModelReplacement
         }
         void Start()
         {
+         
             AfterStart();
         }
 
@@ -393,7 +397,7 @@ namespace ModelReplacement
 
      
 
-            DangerousParent();
+           DangerousParent();
             
         }
         private void DangerousUnparent()
@@ -423,7 +427,6 @@ namespace ModelReplacement
             }
             else if (playerDeathTracker.Died == true)
             {
-                RepairModel();
 
                 // If no children are found after 5 checks, execute this
                 var hair_controller_source = controller.gameObject.GetComponent<PlayerControllerB>();
@@ -438,11 +441,15 @@ namespace ModelReplacement
             }
             if ((applications.Any()))
             {
+                Console.WriteLine($"Setting up applications for {controller.playerUsername}");
+
                 foreach (var application in applications)
                 {
+
                     Console.WriteLine($"{application.GetType().Name} parent");
-                    Transform mappedHead = Map.GetMappedTransform("spine.004");
-  
+                     Transform mappedHead = Map.GetMappedTransform("spine.004");
+                  //  Transform mappedHead = gameObject.transform.Find("head.x");
+                    Console.WriteLine("CurrentHead:" + mappedHead);
                     Transform mappedChest = Map.GetMappedTransform("spine.003");
                     Transform mappedLowerArmRight = Map.GetMappedTransform("arm.R_lower");
                     Transform mappedHip = Map.GetMappedTransform("spine");
@@ -553,7 +560,6 @@ namespace ModelReplacement
             Map.UpdateModelbones();
             if (!controller.isPlayerDead)
             {
-                AttemptReparentMoreCompanyCosmetics();
             }
           
             //Ragdoll
