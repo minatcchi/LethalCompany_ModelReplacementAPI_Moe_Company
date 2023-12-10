@@ -21,7 +21,7 @@ namespace ModelReplacement
         public bool renderLocalDebug = false;
         public bool renderBase = false;
         public bool renderModel = false;
-        public bool died = false;
+        private bool died = false;
         public bool DangerousViewState()
         {
             return ThirdPersonCamera.ViewState;
@@ -431,10 +431,16 @@ namespace ModelReplacement
             if (died == true)
             {
             //    Console.WriteLine("DeathStatus Died:" + died);
-            if (localPlayer) { 
-                var hair_controller_source = StartOfRound.Instance.allPlayerScripts[StartOfRound.Instance.thisClientPlayerId].GetComponent<PlayerControllerB>();
+        
+                    var cosmeticAppsChilds = controller.GetComponentsInChildren<CosmeticInstance>();
+                    var numberOfChildren = cosmeticAppsChilds.Length;
+                    Console.WriteLine("Updated number of children: " + numberOfChildren);
+                    if (numberOfChildren == 0) { 
+
+                    var hair_controller_source = StartOfRound.Instance.allPlayerScripts[StartOfRound.Instance.thisClientPlayerId].GetComponent<PlayerControllerB>();
 
                 ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
+        
                 }
                 AttemptReparentMoreCompanyCosmetics();
           
