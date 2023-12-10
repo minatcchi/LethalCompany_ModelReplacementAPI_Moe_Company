@@ -21,7 +21,7 @@ namespace ModelReplacement
         public bool renderLocalDebug = false;
         public bool renderBase = false;
         public bool renderModel = false;
-        private bool died = false;
+        public bool died = false;
         public bool DangerousViewState()
         {
             return ThirdPersonCamera.ViewState;
@@ -105,7 +105,6 @@ namespace ModelReplacement
         private void CreateAndParentRagdoll(DeadBodyInfo bodyinfo)
         {
             Console.WriteLine($"Death on {controller.playerUsername}");
-            died = true;
             deadBody = bodyinfo.gameObject;
             SkinnedMeshRenderer deadBodyRenderer = deadBody.GetComponentInChildren<SkinnedMeshRenderer>();
             replacementDeadBody = UnityEngine.Object.Instantiate<GameObject>(replacementModel);
@@ -151,6 +150,7 @@ namespace ModelReplacement
 
 
             }
+            died = true;
 
         }
 
@@ -296,6 +296,7 @@ namespace ModelReplacement
         {
             if (!ModelReplacementAPI.moreCompanyPresent) { return; }
             if (moreCompanyCosmeticsReparented) { return; } //cosmetics already parented
+
             DangerousParent();
 
         }
@@ -318,10 +319,10 @@ namespace ModelReplacement
         }
         private void DangerousParent()
         {
-            var applications = controller.gameObject.GetComponentsInChildren<CosmeticApplication>();
-            {
+             CosmeticApplication[] applications;
+   
+            applications = controller.gameObject.GetComponentsInChildren<CosmeticApplication>();
 
-            }
             if ((applications.Any()))
             {
                 foreach (var application in applications)
@@ -344,6 +345,7 @@ namespace ModelReplacement
 
                     foreach (var cosmeticInstance in application.spawnedCosmetics)
                     {
+                        if (cosmeticInstance != null) { 
                         Transform transform = null;
                         switch (cosmeticInstance.cosmeticType)
                         {
@@ -369,6 +371,12 @@ namespace ModelReplacement
                         cosmeticInstance.transform.position = transform.position;
                         cosmeticInstance.transform.rotation = transform.rotation;
                         cosmeticInstance.transform.parent = transform;
+                    }
+                    }
+                    if (died == true)
+                    {
+                        Console.WriteLine("Died = false");
+                        died = false;
                     }
                     moreCompanyCosmeticsReparented = true;
                 }
@@ -416,7 +424,21 @@ namespace ModelReplacement
 
             //Update replacement model
             Map.UpdateModelbones();
+            if (!controller.isPlayerDead && died == false && !localPlayer) { 
+           // Console.WriteLine("DeathStatus:" + died);
             AttemptReparentMoreCompanyCosmetics();
+            }
+            if (died == true)
+            {
+            //    Console.WriteLine("DeathStatus Died:" + died);
+            if (localPlayer) { 
+                var hair_controller_source = StartOfRound.Instance.allPlayerScripts[StartOfRound.Instance.thisClientPlayerId].GetComponent<PlayerControllerB>();
+
+                ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
+                }
+                AttemptReparentMoreCompanyCosmetics();
+          
+            }
 
             //Ragdoll
             if (ragdollEnabled)
@@ -446,9 +468,9 @@ namespace ModelReplacement
                     }
                 }
             }
-                
+
             //HeldItem handled through patch
-            
+
             AfterUpdate();
         }
 
@@ -461,7 +483,7 @@ namespace ModelReplacement
            
             nameTagObj.enabled = true;
             nameTagObj2.enabled = true;
-            AttemptUnparentMoreCompanyCosmetics();
+         //   AttemptUnparentMoreCompanyCosmetics();
 
             Destroy(replacementModel);
             Destroy(replacementDeadBody);

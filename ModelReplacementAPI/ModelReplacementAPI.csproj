@@ -2,18 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>ModelReplacementAPI</AssemblyName>
-    <Description>A template for Lethal Company</Description>
-    <Version>1.0.0</Version>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
     <LethalCompanyPath>D:\SteamLibrary\steamapps\common\Lethal Company\</LethalCompanyPath>
   </PropertyGroup>
   
   <PropertyGroup>
     <RestoreSources>$(RestoreSources);https://api.nuget.org/v3/index.json;https://nuget.bepinex.dev/v3/index.json</RestoreSources>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <ReferencePath>$(ReferencePath);$(LethalCompanyPath)\Lethal Company_Data\Managed</ReferencePath>
     <ReferencePath>$(ReferencePath);$(LethalCompanyPath)\Lethal Company_Data\Plugins</ReferencePath>
@@ -30,38 +26,37 @@
     <PackageReference Include="HarmonyX" Version="2.10.2" IncludeAssets="compile" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework.TrimEnd(`0123456789`))' == 'net'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2" PrivateAssets="all" />
-  </ItemGroup>
-  
   <ItemGroup>
+	  <Reference Include="_3rdPerson">
+		  <HintPath>..\Libraries\3rdPerson.dll</HintPath>
+	  </Reference>
+	  <Reference Include="LCThirdPerson">
+		  <HintPath>..\Libraries\LCThirdPerson.dll</HintPath>
+	  </Reference>
     <Reference Include="Assembly-CSharp" Publicize="true">
       <HintPath>$(LethalCompanyPath)\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
     </Reference>
-    <Reference Include="3rdPerson">
-      <HintPath>..\Libraries\3rdPerson.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="LCThirdPerson">
-      <HintPath>..\Libraries\LCThirdPerson.dll</HintPath>
-      <Private>false</Private>
-    </Reference>
     <Reference Include="MoreCompany">
       <HintPath>..\Libraries\MoreCompany.dll</HintPath>
-      <Private>false</Private>
     </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>$(LethalCompanyPath)\Lethal Company_Data\Managed\Unity.InputSystem.dll</HintPath>
-      <Private>false</Private>
+    </Reference>
+    <Reference Include="Unity.InputSystem.ForUI">
+      <HintPath>$(LethalCompanyPath)\Lethal Company_Data\Managed\Unity.InputSystem.ForUI.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Netcode.Runtime">
       <HintPath>$(LethalCompanyPath)\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
-      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(LethalCompanyPath)\Lethal Company_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
-  
-  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;$(ProjDir)Build&quot; &#xD;&#xA;copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Lethal Company\BepInEx\plugins\BunyaPineTree-ModelReplacementAPI&quot;     " />
-  </Target>-->
+
+<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;\\mina\Lethal Company\BepInEx\plugins\$(ProjectName).dll&quot;" />
+    <Exec Command="copy /Y &quot;$(TargetDir)$(ProjectName).dll&quot; &quot;D:\SteamLibrary\steamapps\common\Lethal Company\BepInEx\plugins\$(ProjectName).dll&quot;" />
+</Target>
+
 </Project>
