@@ -15,7 +15,7 @@ namespace SpaceGirlModelReplacement
 {
     public class BodyReplacementSpaceGirl : BodyReplacementBase
     {
-        public override string boneMapFileName => "boneMapSpaceGirl.json";
+        public override string boneMapFileName => "boneMapSpacegirl.json";
 
         public override GameObject LoadAssetsAndReturnModel()
         {

@@ -24,7 +24,7 @@ namespace SpaceGirlModelReplacement
 
 
 
-    [BepInPlugin("meow.MikuModelReplacement", "Space Girl", "1.0.0")]
+    [BepInPlugin("mina.SpaceGirlModelReplacement", "Space Girl", "1.0.0")]
     [BepInDependency("meow.ModelReplacementAPI", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin
     {
@@ -57,9 +57,9 @@ namespace SpaceGirlModelReplacement
 
             Assets.PopulateAssets();
 
-            Harmony harmony = new Harmony("meow.MikuModelReplacement");
+            Harmony harmony = new Harmony("mina.SpaceGirlModelReplacement");
             harmony.PatchAll();
-            Logger.LogInfo($"Plugin {"meow.MikuModelReplacement"} is loaded!");
+            Logger.LogInfo($"Plugin {"mina.SpaceGirlModelReplacement"} is loaded!");
         }
 
 

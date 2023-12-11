@@ -254,7 +254,9 @@ namespace ModelReplacement
                 pluginsPath = Path.Combine(pluginsPath, "..");
             }
             string[] allfiles = Directory.GetFiles(pluginsPath, "*.json", SearchOption.AllDirectories);
-            jsonPath = allfiles.Where(f => Path.GetFileName(f) == boneMapFileName).First();
+            jsonPath = allfiles.Where(f => String.Equals(Path.GetFileName(f), boneMapFileName, StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+
+
             boneMapJsonStr = File.ReadAllText(jsonPath);
             Map = BoneMap.DeserializeFromJson(boneMapJsonStr);
 
