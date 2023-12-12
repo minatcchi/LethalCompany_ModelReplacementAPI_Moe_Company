@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 670831301
+CRC: 4175801392
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0b12cad72a42d56243c686c3d52732f6
+    Hash: 7087e7fc7316fd8d7c52f8c43b679881
   TypeTreeHash:
     serializedVersion: 2
     Hash: f6718c3d2064345c152313fc958ebad8
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 0b12cad72a42d56243c686c3d52732f6
+    Hash: 7087e7fc7316fd8d7c52f8c43b679881
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -32,7 +32,9 @@ ClassTypes:
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/mixmap.png
 - Assets/Suit.png
+- Assets/NormalMapSuit.png
 - Assets/space girl.prefab
 - Assets/space girl fbx.fbx
 - Assets/FISHBOWL.mat

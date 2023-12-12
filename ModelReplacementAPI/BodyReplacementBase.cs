@@ -13,6 +13,8 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
+using UnityEngine.InputSystem;
+
 
 namespace ModelReplacement
 {
@@ -26,6 +28,8 @@ namespace ModelReplacement
         private PlayerDeathTracker playerDeathTracker;
         private CosmeticApplication[] applications;
         private bool runConnectHairOnce = false;
+        private InputAction f12Action;
+
         public bool DangerousViewState()
         {
             return ThirdPersonCamera.ViewState;
@@ -154,6 +158,12 @@ namespace ModelReplacement
 
 
             }
+            deadBody.gameObject.AddComponent<CosmeticApplication>();
+
+
+                Console.WriteLine($"Re-setting up hair for on death {controller.playerUsername}");
+                ConnectClientToPlayerObjectPatch.Postfix(controller);
+        
             playerDeathTracker.Died = true;
 
         }
@@ -300,10 +310,20 @@ namespace ModelReplacement
         }
         void Start()
         {
+            // Create a new Input Action for the F12 key
+            f12Action = new InputAction(binding: "<Keyboard>/f11");
 
+            // Subscribe to the action event
+            f12Action.performed += OnF12Pressed;
+            f12Action.Enable();
             AfterStart();
         }
-
+        private void OnF12Pressed(InputAction.CallbackContext context)
+        {
+            RepairModel();
+            AttemptReparentMoreCompanyCosmetics();
+            Console.WriteLine(controller.playerUsername+"player model reset");
+        }
         public virtual void AfterUpdate()
         {
 
@@ -435,12 +455,11 @@ namespace ModelReplacement
                 // If no children are found after 5 checks, execute this
                 var hair_controller_source = controller.gameObject.GetComponent<PlayerControllerB>();
                 Console.WriteLine("Player death true setting up dangerous parent");
-                if (localPlayer)
-                {
-
+         
                     Console.WriteLine($"Re-setting up {controller.playerUsername}");
                     ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
-                }
+                
+
                 applications = hair_controller_source.GetComponentsInChildren<CosmeticApplication>();
 
             }
@@ -606,6 +625,9 @@ namespace ModelReplacement
 
         void OnDestroy()
         {
+
+            f12Action.Disable();
+
             Console.WriteLine($"Destroy body component for {controller.playerUsername}");
             controller.thisPlayerModel.enabled = true;
             controller.thisPlayerModelLOD1.enabled = true;
