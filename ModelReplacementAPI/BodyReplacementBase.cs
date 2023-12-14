@@ -58,7 +58,7 @@ namespace ModelReplacement
         public string jsonPath;
 
         public BoneMap Map;
-        public PlayerControllerB controller;
+        private PlayerControllerB controller;
         public GameObject replacementModel;
 
         //Ragdoll components
@@ -158,12 +158,10 @@ namespace ModelReplacement
 
 
             }
-            deadBody.gameObject.AddComponent<CosmeticApplication>();
-
-
+            if (localPlayer) { 
                 Console.WriteLine($"Re-setting up hair for on death {controller.playerUsername}");
-                ConnectClientToPlayerObjectPatch.Postfix(controller);
-        
+              ConnectClientToPlayerObjectPatch.Postfix(controller);
+            }
             playerDeathTracker.Died = true;
 
         }
@@ -171,6 +169,7 @@ namespace ModelReplacement
         public virtual void AfterAwake()
         {
 
+            AttemptReparentMoreCompanyCosmetics();
 
 
         }
@@ -222,16 +221,20 @@ namespace ModelReplacement
             Material gameMat = controller.thisPlayerModel.GetComponent<SkinnedMeshRenderer>().material;
             foreach (Renderer renderer in renderers)
             {
+                if (renderer.gameObject.name != "Suit") { 
                 List<Material> mats = new List<Material>();
                 foreach (Material material in renderer.materials)
                 {
-                    Material mat = new Material(gameMat);
-                    mat.mainTexture = material.mainTexture;
-                    mats.Add(mat);
+               Material mat = new Material(gameMat);
+                        mat.mainTexture = material.mainTexture;
+                        mats.Add(mat);
+                 
                 }
                 renderer.SetMaterials(mats);
-
+                }
             }
+        
+
 
             //Set scripts missing from assetBundle
             try
@@ -294,7 +297,6 @@ namespace ModelReplacement
 
                 playerDeathTracker = gameObject.GetComponent<PlayerDeathTracker>();
             }
-            AttemptReparentMoreCompanyCosmetics();
             AfterAwake();
         }
 
@@ -320,9 +322,63 @@ namespace ModelReplacement
         }
         private void OnF12Pressed(InputAction.CallbackContext context)
         {
+            if (!controller.isPlayerDead) { 
             RepairModel();
+            playerDeathTracker.Died = true;
             AttemptReparentMoreCompanyCosmetics();
-            Console.WriteLine(controller.playerUsername+"player model reset");
+            Console.WriteLine(controller.playerUsername+" player model reset");
+            }
+            else
+            {
+                var deadBody = controller.deadBody.gameObject;
+
+                if (!applications.Any())
+                {
+                    deadBody.AddComponent<CosmeticApplication>();
+                    applications = deadBody.GetComponents<CosmeticApplication>();
+
+
+                }
+       
+                    Console.WriteLine($"Telling all other clients we have hair {controller.playerUsername}");
+                if (localPlayer) { 
+                    ConnectClientToPlayerObjectPatch.Postfix(controller);
+                }
+                applications = deadBody.GetComponents<CosmeticApplication>();
+
+                    if ((applications.Any()))
+                    {
+                        Console.WriteLine($"Setting up applications for {controller.playerUsername}");
+
+                        foreach (var application in applications)
+                        {
+
+                 
+                            foreach (var cosmeticInstance in application.spawnedCosmetics)
+                            {
+                                //Fix Materials
+                                Renderer[] renderers = cosmeticInstance.GetComponentsInChildren<Renderer>();
+                                Material gameMat = controller.thisPlayerModel.GetComponent<SkinnedMeshRenderer>().material;
+                                foreach (Renderer renderer in renderers)
+                                {
+
+                                    List<Material> mats = new List<Material>();
+                                    foreach (Material material in renderer.materials)
+                                    {
+                                        Material mat = new Material(gameMat);
+                                        mat.mainTexture = material.mainTexture;
+                                        mats.Add(mat);
+
+                                    }
+                                    renderer.SetMaterials(mats);
+
+                                }
+                            }
+                        }
+                    }
+                
+                
+            }
         }
         public virtual void AfterUpdate()
         {
@@ -443,7 +499,11 @@ namespace ModelReplacement
         }
         private void DangerousParent()
         {
-            controller = base.GetComponent<PlayerControllerB>();
+            controller = gameObject.GetComponent<PlayerControllerB>();
+
+            var hair_controller_source = controller.gameObject.GetComponent<PlayerControllerB>();
+
+
 
             if (playerDeathTracker.Died == false)
             {
@@ -451,14 +511,12 @@ namespace ModelReplacement
             }
             else if (playerDeathTracker.Died == true)
             {
-
+     if (localPlayer) { 
+                    Console.WriteLine($"Executing hair fix on {controller.playerUsername}");
+                ConnectClientToPlayerObjectPatch.Postfix(controller);
+                }
+                //   ClientRreceiveMessagePatch.ResetHair(StartOfRound.Instance.thisClientPlayerId);
                 // If no children are found after 5 checks, execute this
-                var hair_controller_source = controller.gameObject.GetComponent<PlayerControllerB>();
-                Console.WriteLine("Player death true setting up dangerous parent");
-         
-                    Console.WriteLine($"Re-setting up {controller.playerUsername}");
-                    ConnectClientToPlayerObjectPatch.Postfix(hair_controller_source);
-                
 
                 applications = hair_controller_source.GetComponentsInChildren<CosmeticApplication>();
 
@@ -489,8 +547,10 @@ namespace ModelReplacement
                     application.shinRight = mappedShinRight;
 
                     foreach (var cosmeticInstance in application.spawnedCosmetics)
-                    {
+                    { 
+
                         Transform transform = null;
+                        if (cosmeticInstance != null) { 
                         switch (cosmeticInstance.cosmeticType)
                         {
                             case CosmeticType.HAT:
@@ -511,6 +571,7 @@ namespace ModelReplacement
                             case CosmeticType.R_SHIN:
                                 transform = application.shinRight;
                                 break;
+                        }
                         }
                         cosmeticInstance.transform.position = transform.position;
                         cosmeticInstance.transform.rotation = transform.rotation;
@@ -585,8 +646,9 @@ namespace ModelReplacement
 
             //Update replacement model
             Map.UpdateModelbones();
-            if (!controller.isPlayerDead)
+            if (!controller.isPlayerDead && !localPlayer)
             {
+
             }
 
             //Ragdoll

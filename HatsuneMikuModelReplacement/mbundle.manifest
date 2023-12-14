@@ -1,15 +1,15 @@
 ManifestFileVersion: 0
-CRC: 4175801392
+CRC: 3184440759
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 7087e7fc7316fd8d7c52f8c43b679881
+    Hash: 67ccbd0107b2005c6c3ad4c3161054a7
   TypeTreeHash:
     serializedVersion: 2
-    Hash: f6718c3d2064345c152313fc958ebad8
+    Hash: 24cf34b45e333782ab6450a70697515c
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 7087e7fc7316fd8d7c52f8c43b679881
+    Hash: 67ccbd0107b2005c6c3ad4c3161054a7
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,19 +24,33 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
+- Class: 74
+  Script: {instanceID: 0}
 - Class: 90
   Script: {instanceID: 0}
 - Class: 95
+  Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: 783172dac9f3cde4aacda8020cc9898d, type: 3}
+- Class: 115
   Script: {instanceID: 0}
 - Class: 137
   Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/HeadNoBody.png
 - Assets/mixmap.png
+- Assets/Suit-NoHead.png
+- Assets/Suit NormalMap.png
 - Assets/Suit.png
+- Assets/RealToon/RealToon Shaders/Version 5/HDRP/Default/D_Default_HDRP.shader
 - Assets/NormalMapSuit.png
 - Assets/space girl.prefab
+- Assets/Head.mat
+- Assets/NormalMapHead.png
 - Assets/space girl fbx.fbx
+- Assets/Blink.anim
+- Assets/suit mask map.png
 - Assets/FISHBOWL.mat
 - Assets/Suit.mat
 Dependencies: []
