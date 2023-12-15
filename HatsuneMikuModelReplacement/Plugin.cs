@@ -51,6 +51,8 @@ namespace SpaceGirlModelReplacement
             CosmeticRegistry.LoadCosmeticsFromAssembly(Assembly.GetExecutingAssembly(), cosmeticsBundle);
             //ModelReplacementAPI.RegisterSuitModelReplacement("Green suit", typeof(BodyReplacementMiku));
             ModelReplacement.ModelReplacementAPI.RegisterSuitModelReplacement("Default", typeof(BodyReplacementSpaceGirl));
+            ModelReplacement.ModelReplacementAPI.RegisterSuitModelReplacement("주황색 슈트", typeof(BodyReplacementSpaceGirl));
+
             ModelReplacement.ModelReplacementAPI.RegisterSuitModelReplacement("Orange suit", typeof(BodyReplacementSpaceGirl));
             //ModelReplacementAPI.RegisterSuitModelReplacement("Pajama suit", typeof(BodyReplacementMiku));
             //ModelReplacementAPI.RegisterSuitModelReplacement("Hazard suit", typeof(BodyReplacementMiku));

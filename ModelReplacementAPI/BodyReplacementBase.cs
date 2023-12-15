@@ -26,6 +26,7 @@ namespace ModelReplacement
         public bool renderModel = false;
         private bool isCoroutineRunning = false;
         private PlayerDeathTracker playerDeathTracker;
+        private Blinker blinker;
         private CosmeticApplication[] applications;
         private bool runConnectHairOnce = false;
         private InputAction f12Action;
@@ -112,7 +113,7 @@ namespace ModelReplacement
 
         private void CreateAndParentRagdoll(DeadBodyInfo bodyinfo)
         {
-            Console.WriteLine($"Death on {controller.playerUsername}");
+          //  Console.WriteLine($"Death on {controller.playerUsername}");
             deadBody = bodyinfo.gameObject;
             SkinnedMeshRenderer deadBodyRenderer = deadBody.GetComponentInChildren<SkinnedMeshRenderer>();
             replacementDeadBody = UnityEngine.Object.Instantiate<GameObject>(replacementModel);
@@ -124,7 +125,8 @@ namespace ModelReplacement
             }
             deadBodyRenderer.enabled = false;
 
-
+            var deadEyes = replacementDeadBody.transform.Find("Head").gameObject.AddComponent<Blinker>();
+            deadEyes.DeadEyes();
             //Get all bones in the replacement model and select the ones whose names are in GetMappedBones
             List<Transform> replacementDeadBodyBones = new List<Transform>();
             foreach (SkinnedMeshRenderer renderer in replacementDeadBody.GetComponentsInChildren<SkinnedMeshRenderer>())
@@ -159,7 +161,7 @@ namespace ModelReplacement
 
             }
             if (localPlayer) { 
-                Console.WriteLine($"Re-setting up hair for on death {controller.playerUsername}");
+           //     Console.WriteLine($"Re-setting up hair for on death {controller.playerUsername}");
               ConnectClientToPlayerObjectPatch.Postfix(controller);
             }
             playerDeathTracker.Died = true;
@@ -205,7 +207,7 @@ namespace ModelReplacement
         {
             controller = base.GetComponent<PlayerControllerB>();
 
-            Console.WriteLine($"Awake {controller.playerUsername}");
+       //     Console.WriteLine($"Awake {controller.playerUsername}");
 
             //Load model
             replacementModel = LoadAssetsAndReturnModel();
@@ -252,6 +254,7 @@ namespace ModelReplacement
             SetRenderers(false); //Initializing with renderers disabled prevents model flickering for local player
             replacementModel.transform.localPosition = new Vector3(0, 0, 0);
             replacementModel.SetActive(true);
+            blinker = replacementModel.transform.Find("Head").gameObject.AddComponent<Blinker>();
 
             //sets y extents to the same size for player body and extents.
             var playerBodyExtents = controller.thisPlayerModel.bounds.extents;
@@ -290,6 +293,7 @@ namespace ModelReplacement
             {
                 Console.WriteLine("Player death tracker component added");
                 playerDeathTracker = gameObject.AddComponent<PlayerDeathTracker>();
+
             }
             else
             {
@@ -324,7 +328,6 @@ namespace ModelReplacement
         {
             if (!controller.isPlayerDead) { 
             RepairModel();
-            playerDeathTracker.Died = true;
             AttemptReparentMoreCompanyCosmetics();
             Console.WriteLine(controller.playerUsername+" player model reset");
             }
@@ -586,10 +589,10 @@ namespace ModelReplacement
                 {
                     var cosmeticAppsChilds = base.GetComponentsInChildren<CosmeticInstance>();
                     var numberOfChildren = cosmeticAppsChilds.Length;
-                    Console.WriteLine("Updated number of children: " + numberOfChildren);
+              //      Console.WriteLine("Updated number of children: " + numberOfChildren);
                     if (numberOfChildren > 0)
                     {
-                        Console.WriteLine("More than 1 child found, marking as complete " + numberOfChildren);
+                 //       Console.WriteLine("More than 1 child found, marking as complete " + numberOfChildren);
                         playerDeathTracker.Died = false;
 
                         moreCompanyCosmeticsReparented = true;
@@ -601,7 +604,7 @@ namespace ModelReplacement
                     moreCompanyCosmeticsReparented = true;
                 }
 
-                Console.WriteLine(" reparent done");
+           //     Console.WriteLine(" reparent done");
             }
         }
 
@@ -609,7 +612,7 @@ namespace ModelReplacement
         {
             if (Map.CompletelyDestroyed())
             {
-                Console.WriteLine("Map gone destroy");
+             //   Console.WriteLine("Map gone destroy");
                 Destroy(this);
                 return;
             }
