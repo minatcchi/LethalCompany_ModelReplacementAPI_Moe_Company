@@ -124,9 +124,10 @@ namespace ModelReplacement
                 renderer.enabled = true;
             }
             deadBodyRenderer.enabled = false;
-
             var deadEyes = replacementDeadBody.transform.Find("Head").gameObject.AddComponent<Blinker>();
+            deadEyes.Blink = false;
             deadEyes.DeadEyes();
+            
             //Get all bones in the replacement model and select the ones whose names are in GetMappedBones
             List<Transform> replacementDeadBodyBones = new List<Transform>();
             foreach (SkinnedMeshRenderer renderer in replacementDeadBody.GetComponentsInChildren<SkinnedMeshRenderer>())

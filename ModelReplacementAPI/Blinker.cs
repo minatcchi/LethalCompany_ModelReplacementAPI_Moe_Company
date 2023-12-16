@@ -40,12 +40,13 @@ namespace ModelReplacement
 
         public void DeadEyes()
         {
+            StopCoroutine(BlinkRoutine());
             thisMesh = GetComponent<SkinnedMeshRenderer>();
+            Blink = false;
 
             if (thisMesh.materials.Length > 0)
             {
                 instanceMaterial = thisMesh.materials[0];
-                Blink = false;
                 instanceMaterial.mainTextureOffset = new Vector2(0.01469f, 0.53901f);
             }
             else { Debug.LogError("Didn't find heawd after attaching for dead eyes method"); }
